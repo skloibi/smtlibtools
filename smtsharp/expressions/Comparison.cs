@@ -1,3 +1,5 @@
+using smtsharp.Expressions.Types;
+
 namespace smtsharp.Expressions
 {
     namespace Comparison

@@ -1,9 +1,21 @@
 using System;
+using smtsharp.Expressions.Types;
+using Type = smtsharp.Expressions.Types.Type;
 
 namespace smtsharp.Expressions
 {
     namespace Logic
     {
+        public class Const : ConstantExpression<Bool, bool>
+        {
+            public override bool Value { get; }
+
+            public Const(Bool type, string name, bool value) : base(type, name)
+            {
+                Value = value;
+            }
+        }
+        
         public abstract class LogicExpression : Expression<Bool>
         {
             protected LogicExpression(Bool type, string name) : base(type, name)
