@@ -9,8 +9,8 @@ namespace smtsharp.Expressions
             public IExpression<FixedSizeBitVector> X { get; }
             public IExpression<FixedSizeBitVector> Y { get; }
 
-            public BitwiseExpression(FixedSizeBitVector type, string name, IExpression<FixedSizeBitVector> x,
-                IExpression<FixedSizeBitVector> y) : base(type, name)
+            public BitwiseExpression(string name, IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : 
+                base(x.Type, name)
             {
                 X = x;
                 Y = x;
@@ -23,14 +23,11 @@ namespace smtsharp.Expressions
         {
             public IExpression<FixedSizeBitVector> Value { get; }
 
-            public Not(FixedSizeBitVector type, string name, IExpression<FixedSizeBitVector> value) : base(type, name)
-            {
+            public Not(string name, IExpression<FixedSizeBitVector> value) : base(value.Type, name) => 
                 Value = value;
-            }
 
-            public Not(FixedSizeBitVector type, IExpression<FixedSizeBitVector> value) : base(type, null)
+            public Not(IExpression<FixedSizeBitVector> value) : this(null, value)
             {
-                Value = value;
             }
 
             public override IExpression<Type>[] Operands() => new IExpression<Type>[] {Value};
@@ -38,65 +35,71 @@ namespace smtsharp.Expressions
 
         public class And : BitwiseExpression
         {
-            public And(FixedSizeBitVector type, string name, IExpression<FixedSizeBitVector> x,
-                IExpression<FixedSizeBitVector> y) : base(type, name, x, y)
+            public And(string name, IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : 
+                base(name, x, y)
             {
             }
 
-            public And(FixedSizeBitVector type, IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) :
-                base(type, null, x, y)
+            public And(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
         }
 
         public class Or : BitwiseExpression
         {
-            public Or(FixedSizeBitVector type, string name, IExpression<FixedSizeBitVector> x,
-                IExpression<FixedSizeBitVector> y) : base(type, name, x, y)
+            public Or(string name, IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : 
+                base(name, x, y)
             {
             }
 
-            public Or(FixedSizeBitVector type, IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) :
-                base(type, null, x, y)
+            public Or(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
+            {
+            }
+        }
+        
+        public class XOr : BitwiseExpression
+        {
+            public XOr(string name, IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(name, x, y)
+            {
+            }
+
+            public XOr(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
         }
 
         public class Shl : BitwiseExpression
         {
-            public Shl(FixedSizeBitVector type, string name, IExpression<FixedSizeBitVector> x,
-                IExpression<FixedSizeBitVector> y) : base(type, name, x, y)
+            public Shl(string name, IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) :
+                base(name, x, y)
             {
             }
 
-            public Shl(FixedSizeBitVector type, IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) :
-                base(type, null, x, y)
+            public Shl(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
         }
 
         public class AShr : BitwiseExpression
         {
-            public AShr(FixedSizeBitVector type, string name, IExpression<FixedSizeBitVector> x,
-                IExpression<FixedSizeBitVector> y) : base(type, name, x, y)
+            public AShr(string name, IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : 
+                base(name, x, y)
             {
             }
 
-            public AShr(FixedSizeBitVector type, IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) :
-                base(type, null, x, y)
+            public AShr(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
         }
 
         public class LShr : BitwiseExpression
         {
-            public LShr(FixedSizeBitVector type, string name, IExpression<FixedSizeBitVector> x,
-                IExpression<FixedSizeBitVector> y) : base(type, name, x, y)
+            public LShr(string name, IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : 
+                base(name, x, y)
             {
             }
 
-            public LShr(FixedSizeBitVector type, IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) :
-                base(type, null, x, y)
+            public LShr(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
         }

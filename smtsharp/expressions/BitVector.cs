@@ -9,15 +9,11 @@ namespace smtsharp.Expressions
         {
             public override BigInteger Value { get; }
 
-            public Const(FixedSizeBitVector type, string name, BigInteger value) : base(type, name)
-            {
+            public Const(FixedSizeBitVector type, string name, BigInteger value) : base(type, name) => 
                 Value = value;
-            }
 
-            public Const(FixedSizeBitVector type, BigInteger value) : base(type, null)
-            {
+            public Const(FixedSizeBitVector type, BigInteger value) : base(type, null) => 
                 Value = value;
-            }
         }
     }
 }

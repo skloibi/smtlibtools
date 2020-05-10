@@ -13,5 +13,10 @@ namespace smtsharp.Expressions
         }
 
         public override IExpression<Type>[] Operands() => new IExpression<Type>[0];
+
+        public override string ToString()
+        {
+            return $"{Name} : {Type}";
+        }
     }
 }

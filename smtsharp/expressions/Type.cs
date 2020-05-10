@@ -7,16 +7,14 @@ namespace smtsharp.Expressions
     {
         public abstract class Type
         {
+            public override string ToString() => GetType().Name;
         }
 
         public abstract class NumericType : Type
         {
             public readonly uint Bits;
 
-            protected NumericType(uint bits)
-            {
-                Bits = bits;
-            }
+            protected NumericType(uint bits) => Bits = bits;
         }
 
         public sealed class FixedSizeBitVector : NumericType
@@ -35,6 +33,8 @@ namespace smtsharp.Expressions
                 ReferenceEquals(this, obj) || obj is FixedSizeBitVector other && Equals(other);
 
             public override int GetHashCode() => (int) Bits;
+
+            public override string ToString() => $"BitVec{Bits}";
         }
 
         public sealed class FloatingPoint : NumericType

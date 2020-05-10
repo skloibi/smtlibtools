@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -11,19 +12,37 @@ namespace smtsharp.Expressions
 
         public string Name { get; }
 
+        /// <summary>
+        /// Contains the "leaves" of the formula (i.e. the named variables).
+        /// </summary>
         private readonly Dictionary<string, IVariable<Type>> _declarations;
-        private readonly HashSet<IExpression<Type>>[] _buckets;
 
+        /// <summary>
+        /// Stores all expressions in disjointed buckets that contain the expression IDs.
+        /// Whenever an expression is added, it may link two buckets, which may then be merged into one.
+        /// </summary>
+        // private readonly Dictionary<int, IExpression<Type>>[] _buckets;
         public Formula(string name)
         {
             Name = name;
             _declarations = new Dictionary<string, IVariable<Type>>();
-            _buckets = new HashSet<IExpression<Type>>[] { };
+            // _buckets = new Dictionary<int, IExpression<Type>>[] { };
         }
 
-        private int GenerateId()
+        private int GenerateId() =>
+            Interlocked.Increment(ref _idCounter);
+
+        public IEnumerable<IVariable<Type>> Declarations => _declarations.Values;
+
+        public IVariable<Type>? GetDeclaration(string name)
         {
-            return Interlocked.Increment(ref _idCounter);
+            if (_declarations.TryGetValue(name, out var variable))
+            {
+                Console.WriteLine(variable.GetType().FullName);
+                return variable;
+            }
+
+            return null;
         }
 
         public T Add<T>(T expression) where T : IExpression<Type>
@@ -33,11 +52,6 @@ namespace smtsharp.Expressions
 
             expression.Initialize(this, GenerateId());
 
-            if (expression is IVariable<Type> variable)
-            {
-                return (T) Declare(variable);
-            }
-
             return expression;
         }
 
@@ -45,7 +59,16 @@ namespace smtsharp.Expressions
         {
             if (_declarations.TryGetValue(variable.Name!, out var existing))
                 return (IVariable<T>) existing;
-            _declarations[variable.Name] = variable;
+            _declarations[variable.Name!] = variable;
+            return variable;
+        }
+
+        public IVariable<T> Declare<T>(T type, string name) where T : Type
+        {
+            if (_declarations.TryGetValue(name, out var existing))
+                return (IVariable<T>) existing;
+            var variable = new Variable<T>(type, name);
+            _declarations[name] = variable;
             return variable;
         }
     }

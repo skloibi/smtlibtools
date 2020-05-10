@@ -8,14 +8,18 @@ namespace smtsharp.Expressions
     {
         public class Const : ConstantExpression<Bool, bool>
         {
+            public static readonly Const True = new Const(true);
+            public static readonly Const False = new Const(false);
+
             public override bool Value { get; }
 
-            public Const(Bool type, string name, bool value) : base(type, name)
-            {
+            private Const(bool value) : base(Bool.Type, null) => 
                 Value = value;
-            }
+
+            public static implicit operator bool(Const c) => c.Value;
+            public static implicit operator Const(bool b) => b ? True : False;
         }
-        
+
         public abstract class LogicExpression : Expression<Bool>
         {
             protected LogicExpression(Bool type, string name) : base(type, name)
@@ -27,15 +31,11 @@ namespace smtsharp.Expressions
         {
             public IExpression<Bool> Value { get; }
 
-            public Not(string name, IExpression<Bool> value) : base(Bool.Type, name)
-            {
+            public Not(string name, IExpression<Bool> value) : base(Bool.Type, name) => 
                 Value = value;
-            }
 
-            public Not(IExpression<Bool> value) : base(Bool.Type, null)
-            {
+            public Not(IExpression<Bool> value) : base(Bool.Type, null) => 
                 Value = value;
-            }
 
             public override IExpression<Type>[] Operands() => new IExpression<Type>[] {Value};
         }
@@ -84,6 +84,17 @@ namespace smtsharp.Expressions
             }
 
             public Or(IExpression<Bool> x, IExpression<Bool> y) : base(null, x, y)
+            {
+            }
+        }
+        
+        public class XOr : BinaryLogicExpression
+        {
+            public XOr(string name, IExpression<Bool> x, IExpression<Bool> y) : base(name, x, y)
+            {
+            }
+
+            public XOr(IExpression<Bool> x, IExpression<Bool> y) : base(null, x, y)
             {
             }
         }

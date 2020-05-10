@@ -20,39 +20,55 @@ namespace smtsharp.Expressions
 
         public class Eq<T> : CompareExpression<T> where T : Type
         {
-            public Eq(string name, IExpression<T> x, IExpression<T> y) :
-                base(name, x, y)
+            public Eq(string name, IExpression<T> x, IExpression<T> y) : base(name, x, y)
             {
             }
 
-            public Eq(IExpression<T> x, IExpression<T> y) :
-                base(null, x, y)
+            public Eq(IExpression<T> x, IExpression<T> y) : base(null, x, y)
             {
             }
         }
 
         public class Lt<T> : CompareExpression<T> where T : NumericType
         {
-            public Lt(string name, IExpression<T> x, IExpression<T> y) :
-                base(name, x, y)
+            public Lt(string name, IExpression<T> x, IExpression<T> y) : base(name, x, y)
             {
             }
 
-            public Lt(IExpression<T> x, IExpression<T> y) :
-                base(null, x, y)
+            public Lt(IExpression<T> x, IExpression<T> y) : base(null, x, y)
+            {
+            }
+        }
+        
+        public class ULt : CompareExpression<FixedSizeBitVector>
+        {
+            public ULt(string name, IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(name, x, y)
+            {
+            }
+
+            public ULt(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
         }
 
         public class Gt<T> : CompareExpression<T> where T : NumericType
         {
-            public Gt(string name, IExpression<T> x, IExpression<T> y) :
-                base(name, x, y)
+            public Gt(string name, IExpression<T> x, IExpression<T> y) : base(name, x, y)
             {
             }
 
-            public Gt(IExpression<T> x, IExpression<T> y) :
-                base(null, x, y)
+            public Gt(IExpression<T> x, IExpression<T> y) : base(null, x, y)
+            {
+            }
+        }
+        
+        public class UGt : CompareExpression<FixedSizeBitVector>
+        {
+            public UGt(string name, IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(name, x, y)
+            {
+            }
+
+            public UGt(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
         }
