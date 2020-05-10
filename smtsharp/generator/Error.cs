@@ -11,7 +11,8 @@ namespace smtsharp.Generator
             InvalidBitVectorLiteral,
             InvalidNumericLiteral,
             MissingVariableDeclaration,
-            VariableAlreadyDeclared
+            VariableAlreadyDeclared,
+            InvalidOperand
         }
 
         public static class ErrorMethods
@@ -25,6 +26,7 @@ namespace smtsharp.Generator
                     InvalidNumericLiteral => String.Format("Invalid numeric literal: {0}", args),
                     MissingVariableDeclaration => String.Format("Missing declaration for variable: {0}", args),
                     VariableAlreadyDeclared => String.Format("Variable {0} is already declared", args),
+                    InvalidOperand => String.Format("Invalid operand {0} for operation {1}", args),
                     _ => throw new ArgumentOutOfRangeException(nameof(error), error, null)
                 };
             }

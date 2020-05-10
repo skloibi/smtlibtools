@@ -1,0 +1,362 @@
+$namespace=smtsharp.Generator
+
+using System.Numerics;
+using smtsharp.Expressions;
+using smtsharp.Expressions.Types;
+using smtsharp.Expressions.Conditional;
+using smtsharp.Expressions.Conversion;
+using smtsharp.Expressions.Logic;
+using smtsharp.Expressions.Arithmetic;
+using smtsharp.Expressions.Comparison;
+using smtsharp.Generator.Error;
+
+using static smtsharp.Generator.Error.ErrorType;
+using static smtsharp.Expressions.Types.FixedSizeBitVector;
+
+using Type = smtsharp.Expressions.Types.Type;
+
+COMPILER SMTLIB
+
+    public delegate IVariable<Type>? VariableSource(string name);
+    public delegate bool Declaration(Type type, string name);
+    public delegate void AssertionSink(IExpression<Bool> assertion);
+    
+    public VariableSource GetDeclaredVariable { get; set; }
+    public Declaration Declare { get; set; }
+    public AssertionSink Assert { get; set; }
+     
+    private uint ParseInt() {
+        if (uint.TryParse(t.val, out var intVal))
+            return intVal;
+        Error(InvalidNumericLiteral, t.val);
+        return 0;
+    }
+    
+    private BigInteger ParseBV() {
+        var str = t.val;
+        
+        if (!str.StartsWith("bv")) {
+            Error(InvalidBitVectorLiteral, str);
+            return -1;
+        }
+        
+        var cleared = str.Substring(2);
+        
+        if (BigInteger.TryParse(cleared, out var bv))
+            return bv;
+        Error(InvalidBitVectorLiteral, str);
+        return -1;
+    }
+    
+    private bool CheckBool(IExpression<Type> expression) {
+        if (expression is IExpression<Bool>)
+            return true;
+        Error(TypeMismatch, expression.Type, Bool.Type);
+        return false;
+    }
+    
+    private bool CheckBV(IExpression<Type> expression) {
+        if (expression is IExpression<FixedSizeBitVector>)
+            return true;
+        Error(TypeMismatch, expression.Type, "FixedSizeBitVectors");
+        return false;
+    }
+    
+    private bool CheckFP(IExpression<Type> expression) {
+        if (expression is IExpression<FloatingPoint>)
+            return true;
+        Error(TypeMismatch, expression.Type, "FloatingPoint");
+        return false;
+    }
+    
+    private bool CheckSameType(IExpression<Type> expected, IExpression<Type> actual) {
+        if (expected.Type == actual.Type)
+            return true;
+        Error(TypeMismatch, actual.Type, expected.Type);
+        return false;
+    }
+    
+    private void Error(ErrorType err, params object[] args) {
+        SemErr(err.Format(args));
+    }
+    
+    private IVariable<Type> GetVariable(string name) {
+        var variable = GetDeclaredVariable(name);
+        if (variable == null) 
+            Error(MissingVariableDeclaration, name);
+        return variable;
+    }
+    
+    private IExpression<Type> GenerateConditional(IExpression<Bool> condition, IExpression<Type> trueExpr, IExpression<Type> falseExpr) {
+        if (!CheckSameType(trueExpr, falseExpr)) {
+            return null;
+        }
+        
+        return (trueExpr, falseExpr) switch {
+            (IExpression<Bool> trueB, IExpression<Bool> falseB) => new Ite<Bool>(condition, trueB, falseB),
+            (IExpression<FixedSizeBitVector> trueB, IExpression<FixedSizeBitVector> falseB) => new Ite<FixedSizeBitVector>(condition, trueB, falseB),
+            (IExpression<FloatingPoint> trueB, IExpression<FloatingPoint> falseB) => new Ite<FloatingPoint>(condition, trueB, falseB),
+            _ => new Ite<Type>(condition, trueExpr, falseExpr)
+        };
+    }
+
+/*------------------------------------------------------------------------*
+ *----- SCANNER DESCRIPTION ----------------------------------------------*
+ *------------------------------------------------------------------------*/
+
+CHARACTERS
+	tab             = '\u0009'. /*  9 = tabulator */
+	eol             = '\u000a'. /* 10 = line feed */
+	cr              = '\u000d'. /* 13 = carriage return */
+
+    letter          = 'A'..'Z' + 'a'..'z' + '_'.
+    digit           = '0'..'9'.
+    whiteSpace      = ' ' + '\t' + '\r' + '\n'.
+    colon           = ':'.
+    hyphen          = '-'.
+
+TOKENS
+    ident           = letter {letter | digit}.
+    number          = digit {digit}.
+    option          = colon {letter | digit | hyphen}.
+    
+//    /*--------------------------------------------------------------------------------*/
+//	intCon =
+//		( digit {digit} | digit {digit} CONTEXT ("." notDigit)
+//		| ("0x" | "0X") hexDigit {hexDigit}
+//		)
+//		["U" | "u" | "L" | "l" | "UL" | "Ul" | "uL" | "ul" | "LU" | "Lu" | "lU" | "lu"].
+//    /*--------------------------------------------------------------------------------*/
+  
+	/*----- built-in sorts ----------------------------------------------------------*/
+	bool            = "Bool".
+
+COMMENTS FROM ";" TO eol
+
+IGNORE eol + cr + tab + whiteSpace
+
+PRODUCTIONS
+    SMTLIB =
+        { 
+        "("
+        ( "declare-fun" 
+          ident                                                 (. var name = t.val; .)
+          "(" /* TODO: enable function declarations */ ")"
+          Type<out var type>                                    (. if (type != null && !Declare(type, name)) .) 
+                                                                (.     Error(VariableAlreadyDeclared, name); .)
+        | "assert" 
+          BoolExpr<.out var assertion.>                         (. if (assertion != null) .)
+                                                                (.     Assert(assertion); .)
+        | "set-logic" ident
+        | "set-option" option ident
+        | "push"
+        | "pop"
+        | "reset"
+        | "check-sat"
+        | "get-model"
+        | "get-value"
+        | "exit"
+        )
+        ")"
+        }
+        .
+    
+    Type<out Type type> =                                       (. type = null; .)
+        ( "(" "_" 
+          ( BitVecType<out var bvType>                          (. type = bvType; .)
+          | FloatingPointType<out var fpType>                   (. type = fpType; .)
+          )
+        | bool                                                  (. type = Bool.Type; .)
+        )
+        .
+        
+    BitVecType<out FixedSizeBitVector type> =
+        "BitVec"
+        number                                                  (. type = Bv(ParseInt()); .)
+        ")"
+        .
+    
+    FloatingPointType<out FloatingPoint type> =
+        "FloatingPoint"
+        number                                                  (. var eb = ParseInt();.)
+        number                                                  (. var sb = ParseInt(); .)
+                                                                (. type = new FloatingPoint(eb, sb); .)
+        ")"
+        .
+
+    Expr<.out IExpression<Type> expression.> =                  (. expression = null; .)
+        ( ident                                                 (. expression = GetVariable(t.val); .)
+        | "("
+          ( Literal<.out var constExpr.>                        (. expression = constExpr; .)
+          | UnaryExpr<.out expression.>
+          | BinaryExpr<.out expression.>
+          | "ite"
+            BoolExpr<.out var cond.>
+            Expr<.out var trueExpr.>
+            Expr<.out var falseExpr.>                           (. expression = GenerateConditional(cond, trueExpr, falseExpr); .)
+          | VariadicExpr<.out expression.>
+          )
+          ")"
+        )
+        .
+
+    Literal<.out IExpression<Type> constant.> =                 (. constant = null; .)
+        (
+          "_"
+          ident                                                 (. var value = ParseBV(); .)
+          number                                                (. var width = ParseInt(); .)
+                                                                (. var type = Bv(width); .)
+                                                                (. constant = new Expressions.BitVector.Const(type, value); .)
+        |                                                       (. Const lConst;.)
+        ( "true"                                                (. lConst = true; .)
+        | "false"                                               (. lConst = false; .)
+        )                                                       (. constant = lConst; .)
+        ) 
+        .
+        
+    UnaryExpr<.out IExpression<Type> expression.> =             (. expression = null; .)
+        ( "not" BoolExpr<.out var op.>                          (. expression = new Not(op); .)
+        | "bvnot" BVExpr<.out var op.>                          (. expression = new Bitwise.Not(op); .)
+        | "bvneg" BVExpr<.out var op.>                          (. expression = new Neg<FixedSizeBitVector>(op); .)
+        | "("
+          ( "extract" 
+            number                                              (. var endIdx = ParseInt(); .)
+            number                                              (. var startIdx = ParseInt(); .)
+                                                                (. FixedSizeBitVector toType = null; .)
+                                                                (. if (startIdx >= endIdx) .)
+                                                                (.     Error(InvalidOperand, endIdx, "extract"); .)
+                                                                (. else .)
+                                                                (.     toType = Bv(endIdx - startIdx + 1); .)
+            ")"
+            BVExpr<.out var op.>                                (. if (toType != null) .)
+                                                                (.     expression = new Extract(toType, op, startIdx); .)
+          | "_" 
+            ( "sign_extend"
+              number                                            (. var toBits = ParseInt(); .)
+                                                                (. var toType = Bv(toBits); .)
+              ")"
+              BVExpr<.out var op.>                              (. expression = new SignExtend(toType, op); .)
+            | "zero_extend"
+              number                                            (. var toBits = ParseInt(); .)
+                                                                (. var toType = Bv(toBits); .)
+              ")"
+              BVExpr<.out var op.>                              (. expression = new SignExtend(toType, op); .)
+            )
+          )
+        )
+        .
+        
+    BinaryExpr<.out IExpression<Type> expression.> =            (. expression = null; .)
+        ( "=>"
+          BoolExpr<.out var a.>
+          BoolExpr<.out var b.>                                 (. if (CheckSameType(a, b)) expression = new Implies(a, b); .)
+        | "bvand"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new Bitwise.And(a, b); .)
+        | "bvor"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new Bitwise.Or(a, b); .)
+        | "bvxor"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new Bitwise.XOr(a, b); .)
+        | "bvadd"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new Add<FixedSizeBitVector>(a, b); .)
+        | "bvmul"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new Mul<FixedSizeBitVector>(a, b); .)
+        | "bvsdiv"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new Div<FixedSizeBitVector>(a, b); .)
+        | "bvudiv"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new UDiv(a, b); .)
+        | "bvsrem"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new Rem<FixedSizeBitVector>(a, b); .)
+        | "bvurem"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new URem(a, b); .)
+        | "bvshl"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new Bitwise.Shl(a, b); .)
+        | "bvlshr"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new Bitwise.LShr(a, b); .)
+        | "bvslt"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new Lt<FixedSizeBitVector>(a, b); .)
+        | "bvsle"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new Not(new Lt<FixedSizeBitVector>(b, a)); .)
+        | "bvsgt"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new Lt<FixedSizeBitVector>(b, a); .)
+        | "bvsge"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new Not(new Lt<FixedSizeBitVector>(a, b)); .)
+        | "bvult"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new ULt(a, b); .)
+        | "bvule"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new Not(new ULt(b, a)); .)
+        | "bvugt"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new ULt(b, a); .)
+        | "bvuge"
+          BVExpr<.out var a.>
+          BVExpr<.out var b.>                                   (. if (CheckSameType(a, b)) expression = new Not(new ULt(a, b)); .)
+        )
+        .
+        
+    VariadicExpr<.out IExpression<Type> expression.> =          (. expression = null; .)
+        (                                                       (. IExpression<Bool> expr; .)
+          ( "and"
+            BoolExpr<.out expr.>
+            BoolExpr<.out var op.>                              (. expr = new And(expr, op); .)
+            { 
+              BoolExpr<.out op.>                                (. expr = new And(expr, op); .)
+            }
+          | "or"
+            BoolExpr<.out expr.>
+            BoolExpr<.out var op.>                              (. expr = new And(expr, op); .)
+            { 
+              BoolExpr<.out op.>                                (. expr = new And(expr, op); .)
+            }
+          )                                                     (. expression = expr; .)
+        | "="
+          Expr<.out var expr.>
+          Expr<.out var op.>                                    (. if (CheckSameType(expr, op)) expr = new Eq<Type>(expr, op); .)
+          {
+            Expr<.out op.>                                      (. if (CheckSameType(expr, op)) expr = new Eq<Type>(expr, op); .)
+          }                                                     (. expression = expr; .)
+        )                                               
+        .
+        
+	/*----- helper productions for simplified type checking ----------------------------------------------------------*/
+        
+    BoolExpr<.out IExpression<Bool> expression.> =              (. expression = null; .)
+        Expr<.out var expr.>                                    (. if (expr is IExpression<Bool> boolExpr) .)
+                                                                (.     expression = boolExpr; .)
+                                                                (. else .)
+                                                                (.     Error(TypeMismatch, expr.Type, Bool.Type); .)
+                                                                (. Console.WriteLine(expression); .)
+        .
+    
+    BVExpr<.out IExpression<FixedSizeBitVector> expression.> =  (. expression = null; .)
+        Expr<.out var expr.>                                    (. if (expr is IExpression<FixedSizeBitVector> bvExpr) .)
+                                                                (.     expression = bvExpr; .)
+                                                                (. else .)
+                                                                (.     Error(TypeMismatch, expr.Type, "FixedSizeBitVector"); .)
+        .
+    
+    
+//    FPExpr<.out IExpression<FloatingPoint> expression.> =       (. expression = null; .)
+//        Expr<.out var expr.>                                    (. if (op is IExpression<FloatingPoint> fpExpr) .)
+//                                                                (.     expression = fpExpr; .)
+//                                                                (. else .)
+//                                                                (.     Error(TypeMismatch, expr.Type, "FloatingPoint"); .)
+//        .
+
+END SMTLIB.
