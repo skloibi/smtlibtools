@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using smtsharp.Expressions.Types;
 
@@ -10,7 +11,7 @@ namespace smtsharp.Expressions
             public bool Signed { get; }
             private readonly BitArray _exponent;
             private readonly BitArray _significand;
-            
+
             /// <summary>
             /// Returns the wrapped exponent to ensure immutability.
             /// </summary>
@@ -35,6 +36,8 @@ namespace smtsharp.Expressions
                 this(type, null, signed, exponent, significand)
             {
             }
+
+            public override string ToString() => $@"({(Convert.ToByte(Signed))} {_exponent} {_significand})";
         }
     }
 }

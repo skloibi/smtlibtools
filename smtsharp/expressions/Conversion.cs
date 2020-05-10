@@ -18,6 +18,8 @@ namespace smtsharp.Expressions
             }
 
             public override IExpression<Type>[] Operands() => new IExpression<Type>[] {Value};
+            
+            public override string ToString() => $@"(({ToType}) {Value})";
         }
         
         public class Extract : Convert<FixedSizeBitVector, FixedSizeBitVector>
@@ -34,6 +36,8 @@ namespace smtsharp.Expressions
                 this(type, null, value, startIdx)
             {
             }
+            
+            public override string ToString() => $@"(({ToType}:{StartIdx}) {Value})";
         }
 
         public class SignExtend : Convert<FixedSizeBitVector, FixedSizeBitVector>
@@ -44,8 +48,9 @@ namespace smtsharp.Expressions
             public SignExtend(FixedSizeBitVector type, IExpression<FixedSizeBitVector> value) : 
                 base(type, null, value)
             {
-                
             } 
+            
+            public override string ToString() => $@"((sign-extend:{ToType}) {Value})";
         }
         
         public class ZeroExtend : Convert<FixedSizeBitVector, FixedSizeBitVector>
@@ -56,8 +61,9 @@ namespace smtsharp.Expressions
             public ZeroExtend(FixedSizeBitVector type, IExpression<FixedSizeBitVector> value) : 
                 base(type, null, value)
             {
-                
             }
+            
+            public override string ToString() => $@"((zero-extend:{ToType}) {Value})";
         }
     }
 }

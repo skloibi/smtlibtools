@@ -25,6 +25,8 @@ namespace smtsharp.Expressions
 
             public override IExpression<Type>[] Operands() => 
                 new IExpression<Type>[] { Condition, TrueExpr, FalseExpr };
+            
+            public override string ToString() => $@"({Condition} ? {TrueExpr} : {FalseExpr})";
         }
         
     }

@@ -30,6 +30,8 @@ namespace smtsharp.Expressions
                 Value = value;
 
             public override IExpression<Type>[] Operands() => new IExpression<Type>[] {Value};
+
+            public override string ToString() => $"-{Value}";
         }
 
         public class Add<T> : BinaryArithmeticExpression<T> where T : NumericType
@@ -41,6 +43,8 @@ namespace smtsharp.Expressions
             public Add(IExpression<T> x, IExpression<T> y) : base(null, x, y)
             {
             }
+            
+            public override string ToString() => $"({X} + {Y})";
         }
 
         public class Sub<T> : BinaryArithmeticExpression<T> where T : NumericType
@@ -52,6 +56,8 @@ namespace smtsharp.Expressions
             public Sub(IExpression<T> x, IExpression<T> y) : base(null, x, y)
             {
             }
+            
+            public override string ToString() => $"({X} - {Y})";
         }
 
 
@@ -64,6 +70,8 @@ namespace smtsharp.Expressions
             public Mul(IExpression<T> x, IExpression<T> y) : base(null, x, y)
             {
             }
+            
+            public override string ToString() => $"({X} * {Y})";
         }
 
         public class Div<T> : BinaryArithmeticExpression<T> where T : NumericType
@@ -75,6 +83,8 @@ namespace smtsharp.Expressions
             public Div(IExpression<T> x, IExpression<T> y) : base(null, x, y)
             {
             }
+            
+            public override string ToString() => $"({X} / {Y})";
         }
         
         public class UDiv : BinaryArithmeticExpression<FixedSizeBitVector>
@@ -86,6 +96,8 @@ namespace smtsharp.Expressions
             public UDiv(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
+            
+            public override string ToString() => $"({X} |/| {Y})";
         }
 
         public class Rem<T> : BinaryArithmeticExpression<T> where T : NumericType
@@ -97,6 +109,8 @@ namespace smtsharp.Expressions
             public Rem(IExpression<T> x, IExpression<T> y) : base(null, x, y)
             {
             }
+            
+            public override string ToString() => $"({X} % {Y})";
         }
         
         public class URem : BinaryArithmeticExpression<FixedSizeBitVector>
@@ -108,6 +122,8 @@ namespace smtsharp.Expressions
             public URem(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
+            
+            public override string ToString() => $"({X} |%| {Y})";
         }
     }
 }

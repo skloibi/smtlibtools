@@ -31,6 +31,8 @@ namespace smtsharp.Expressions
             }
 
             public override IExpression<Type>[] Operands() => new IExpression<Type>[] {Value};
+            
+            public override string ToString() => $@"~{Value}";
         }
 
         public class And : BitwiseExpression
@@ -43,6 +45,8 @@ namespace smtsharp.Expressions
             public And(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
+            
+            public override string ToString() => $@"({X} & {Y})";
         }
 
         public class Or : BitwiseExpression
@@ -55,6 +59,8 @@ namespace smtsharp.Expressions
             public Or(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
+            
+            public override string ToString() => $@"({X} | {Y})";
         }
         
         public class XOr : BitwiseExpression
@@ -66,6 +72,8 @@ namespace smtsharp.Expressions
             public XOr(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
+            
+            public override string ToString() => $@"({X} ^ {Y})";
         }
 
         public class Shl : BitwiseExpression
@@ -78,6 +86,8 @@ namespace smtsharp.Expressions
             public Shl(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
+            
+            public override string ToString() => $@"({X} << {Y})";
         }
 
         public class AShr : BitwiseExpression
@@ -90,6 +100,8 @@ namespace smtsharp.Expressions
             public AShr(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
+            
+            public override string ToString() => $@"({X} >> {Y})";
         }
 
         public class LShr : BitwiseExpression
@@ -102,6 +114,8 @@ namespace smtsharp.Expressions
             public LShr(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
+            
+            public override string ToString() => $@"({X} >>> {Y})";
         }
     }
 }

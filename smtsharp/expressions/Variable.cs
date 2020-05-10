@@ -16,7 +16,7 @@ namespace smtsharp.Expressions
 
         public override string ToString()
         {
-            return $"{Name} : {Type}";
+            return $"({Name} : {Type})";
         }
     }
 }

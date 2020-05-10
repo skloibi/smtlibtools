@@ -14,6 +14,8 @@ namespace smtsharp.Expressions
 
             public Const(FixedSizeBitVector type, BigInteger value) : base(type, null) => 
                 Value = value;
+            
+            public override string ToString() => $@"({Value} : {Type})";
         }
     }
 }

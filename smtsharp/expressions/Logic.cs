@@ -13,11 +13,13 @@ namespace smtsharp.Expressions
 
             public override bool Value { get; }
 
-            private Const(bool value) : base(Bool.Type, null) => 
+            private Const(bool value) : base(Bool.Type, null) =>
                 Value = value;
 
             public static implicit operator bool(Const c) => c.Value;
             public static implicit operator Const(bool b) => b ? True : False;
+
+            public override string ToString() => $@"{Value}";
         }
 
         public abstract class LogicExpression : Expression<Bool>
@@ -31,13 +33,15 @@ namespace smtsharp.Expressions
         {
             public IExpression<Bool> Value { get; }
 
-            public Not(string name, IExpression<Bool> value) : base(Bool.Type, name) => 
+            public Not(string name, IExpression<Bool> value) : base(Bool.Type, name) =>
                 Value = value;
 
-            public Not(IExpression<Bool> value) : base(Bool.Type, null) => 
+            public Not(IExpression<Bool> value) : base(Bool.Type, null) =>
                 Value = value;
 
             public override IExpression<Type>[] Operands() => new IExpression<Type>[] {Value};
+
+            public override string ToString() => $@"!{Value}";
         }
 
         public abstract class BinaryLogicExpression : LogicExpression
@@ -64,6 +68,8 @@ namespace smtsharp.Expressions
             public Implies(IExpression<Bool> x, IExpression<Bool> y) : base(null, x, y)
             {
             }
+
+            public override string ToString() => $@"({X} => {Y})";
         }
 
         public class And : BinaryLogicExpression
@@ -75,6 +81,8 @@ namespace smtsharp.Expressions
             public And(IExpression<Bool> x, IExpression<Bool> y) : base(null, x, y)
             {
             }
+
+            public override string ToString() => $@"({X} && {Y})";
         }
 
         public class Or : BinaryLogicExpression
@@ -86,8 +94,10 @@ namespace smtsharp.Expressions
             public Or(IExpression<Bool> x, IExpression<Bool> y) : base(null, x, y)
             {
             }
+
+            public override string ToString() => $@"({X} || {Y})";
         }
-        
+
         public class XOr : BinaryLogicExpression
         {
             public XOr(string name, IExpression<Bool> x, IExpression<Bool> y) : base(name, x, y)
@@ -97,6 +107,8 @@ namespace smtsharp.Expressions
             public XOr(IExpression<Bool> x, IExpression<Bool> y) : base(null, x, y)
             {
             }
+
+            public override string ToString() => $@"({X} ^ {Y})";
         }
     }
 }

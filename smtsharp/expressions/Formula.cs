@@ -36,13 +36,7 @@ namespace smtsharp.Expressions
 
         public IVariable<Type>? GetDeclaration(string name)
         {
-            if (_declarations.TryGetValue(name, out var variable))
-            {
-                Console.WriteLine(variable.GetType().FullName);
-                return variable;
-            }
-
-            return null;
+            return _declarations.TryGetValue(name, out var variable) ? variable : null;
         }
 
         public T Add<T>(T expression) where T : IExpression<Type>
@@ -50,26 +44,19 @@ namespace smtsharp.Expressions
             if (expression.IsDeclared)
                 throw new AlreadyInitializedException<T>(this, expression);
 
+            Console.WriteLine($"Initializing {expression}");
             expression.Initialize(this, GenerateId());
-
             return expression;
         }
 
-        public IVariable<T> Declare<T>(IVariable<T> variable) where T : Type
+        public bool Declare<T>(T type, string name) where T : Type
         {
-            if (_declarations.TryGetValue(variable.Name!, out var existing))
-                return (IVariable<T>) existing;
-            _declarations[variable.Name!] = variable;
-            return variable;
-        }
-
-        public IVariable<T> Declare<T>(T type, string name) where T : Type
-        {
-            if (_declarations.TryGetValue(name, out var existing))
-                return (IVariable<T>) existing;
+            if (_declarations.ContainsKey(name))
+                return false;
             var variable = new Variable<T>(type, name);
+            Console.WriteLine($"Declaring {variable}");
             _declarations[name] = variable;
-            return variable;
+            return true;
         }
     }
 

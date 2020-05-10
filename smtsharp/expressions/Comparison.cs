@@ -27,6 +27,8 @@ namespace smtsharp.Expressions
             public Eq(IExpression<T> x, IExpression<T> y) : base(null, x, y)
             {
             }
+            
+            public override string ToString() => $@"({X} == {Y})";
         }
 
         public class Lt<T> : CompareExpression<T> where T : NumericType
@@ -38,6 +40,8 @@ namespace smtsharp.Expressions
             public Lt(IExpression<T> x, IExpression<T> y) : base(null, x, y)
             {
             }
+            
+            public override string ToString() => $@"({X} < {Y})";
         }
         
         public class ULt : CompareExpression<FixedSizeBitVector>
@@ -49,28 +53,8 @@ namespace smtsharp.Expressions
             public ULt(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
             {
             }
-        }
-
-        public class Gt<T> : CompareExpression<T> where T : NumericType
-        {
-            public Gt(string name, IExpression<T> x, IExpression<T> y) : base(name, x, y)
-            {
-            }
-
-            public Gt(IExpression<T> x, IExpression<T> y) : base(null, x, y)
-            {
-            }
-        }
-        
-        public class UGt : CompareExpression<FixedSizeBitVector>
-        {
-            public UGt(string name, IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(name, x, y)
-            {
-            }
-
-            public UGt(IExpression<FixedSizeBitVector> x, IExpression<FixedSizeBitVector> y) : base(null, x, y)
-            {
-            }
+            
+            public override string ToString() => $@"({X} |<| {Y})";
         }
     }
 }
