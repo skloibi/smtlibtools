@@ -7,6 +7,22 @@ namespace smtsharp.Expressions
     {
         public abstract class Type
         {
+            protected bool Equals(Type other) => throw new NotImplementedException();
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != GetType()) return false;
+                return Equals((Type) obj);
+            }
+
+            public override int GetHashCode() => throw new NotImplementedException();
+
+            public static bool operator ==(Type left, Type right) => Equals(left, right);
+
+            public static bool operator !=(Type left, Type right) => !Equals(left, right);
+
             public override string ToString() => GetType().Name;
         }
 
@@ -34,6 +50,10 @@ namespace smtsharp.Expressions
 
             public override int GetHashCode() => (int) Bits;
 
+            public static bool operator ==(FixedSizeBitVector left, FixedSizeBitVector right) => Equals(left, right);
+
+            public static bool operator !=(FixedSizeBitVector left, FixedSizeBitVector right) => !Equals(left, right);
+
             public override string ToString() => $"BitVec{Bits}";
         }
 
@@ -48,14 +68,18 @@ namespace smtsharp.Expressions
                 SBits = sbits;
             }
 
+
             private bool Equals(FloatingPoint other) =>
                 EBits == other.EBits && SBits == other.SBits;
 
             public override bool Equals(object obj) =>
                 ReferenceEquals(this, obj) || obj is FloatingPoint other && Equals(other);
 
-            public override int GetHashCode() =>
-                HashCode.Combine(EBits, SBits);
+            public override int GetHashCode() => HashCode.Combine(EBits, SBits);
+
+            public static bool operator ==(FloatingPoint left, FloatingPoint right) => Equals(left, right);
+
+            public static bool operator !=(FloatingPoint left, FloatingPoint right) => !Equals(left, right);
 
             public override string ToString() =>
                 $"FloatingPoint{EBits + SBits}";
