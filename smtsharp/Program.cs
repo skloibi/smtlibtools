@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using smtsharp.Expressions;
 using smtsharp.Generator;
 using smtsharp.Util;
@@ -41,15 +42,32 @@ namespace smtsharp
                         // Console.WriteLine($"; {solver.Check()}");
                         break;
                     case ":show":
-                        Console.WriteLine("================\nCurrent formula:");
+                        Console.WriteLine("================");
+                        Console.WriteLine("Current formula:");
+                        Console.WriteLine($"Nr. of expressions: {formula.Length})");
                         formActions.Apply(Console.WriteLine);
                         Console.WriteLine("================");
                         break;
                     case ":vars":
-                        Console.WriteLine("================\nDeclarations:");
+                        Console.WriteLine("================");
+                        Console.WriteLine("Declarations:");
+                        Console.WriteLine($"Nr. of variables: {formula.Declarations.Count})");
                         foreach (IVariable<Type> variable in formula.Declarations)
                             Console.WriteLine(variable);
                         Console.WriteLine("================");
+                        break;
+                    case ":load":
+                        var file = Console.ReadLine();
+                        Console.WriteLine("Loading file: " + file);
+                        try
+                        {
+                            parser.ParseFile(file);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine($"ERROR: Could not load file: {e.Message}");
+                        }
+
                         break;
                     default:
                         parser.ParseExpression(line);
