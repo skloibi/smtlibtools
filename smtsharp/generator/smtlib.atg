@@ -72,7 +72,7 @@ COMPILER SMTLIB
     private bool CheckSameType(IExpression<Type> expected, IExpression<Type> actual) {
         if (expected.Type == actual.Type)
             return true;
-        Error(TypeMismatch, actual.Type, expected.Type);
+        Error(TypeMismatch, $"{actual} : {actual.Type}", $"{expected} : {expected.Type}");
         return false;
     }
     
@@ -341,7 +341,6 @@ PRODUCTIONS
                                                                 (.     expression = boolExpr; .)
                                                                 (. else .)
                                                                 (.     Error(TypeMismatch, expr.Type, Bool.Type); .)
-                                                                (. Console.WriteLine(expression); .)
         .
     
     BVExpr<.out IExpression<FixedSizeBitVector> expression.> =  (. expression = null; .)

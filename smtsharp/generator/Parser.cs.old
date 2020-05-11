@@ -370,7 +370,7 @@ public delegate IVariable<Type>? VariableSource(string name);
 				var endIdx = ParseInt(); 
 				Expect(2);
 				var startIdx = ParseInt(); 
-				Type toType = null; 
+				FixedSizeBitVector toType = null; 
 				if (startIdx >= endIdx) 
 				Error(InvalidOperand, endIdx, "extract"); 
 				else 
