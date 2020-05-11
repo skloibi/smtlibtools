@@ -35,10 +35,8 @@ namespace smtsharp.Expressions
 
         public ICollection<IVariable<Type>> Declarations => _declarations.Values;
 
-        public IVariable<Type>? GetDeclaration(string name)
-        {
-            return _declarations.TryGetValue(name, out var variable) ? variable : null;
-        }
+        public IVariable<Type>? GetDeclaration(string name) => 
+            _declarations.TryGetValue(name, out var variable) ? variable : null;
 
         public T Add<T>(T expression) where T : IExpression<Type>
         {
