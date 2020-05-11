@@ -16,7 +16,7 @@ namespace smtsharp.Expressions
         /// <summary>
         /// Contains the "leaves" of the formula (i.e. the named variables).
         /// </summary>
-        private readonly Dictionary<string, IVariable<Type>> _declarations;
+        private readonly IDictionary<string, IVariable<Type>> _declarations;
 
         /// <summary>
         /// Stores all expressions in disjointed buckets that contain the expression IDs.
@@ -26,7 +26,7 @@ namespace smtsharp.Expressions
         public Formula(string name)
         {
             Name = name;
-            _declarations = new Dictionary<string, IVariable<Type>>();
+            _declarations = new SortedDictionary<string, IVariable<Type>>();
             // _buckets = new Dictionary<int, IExpression<Type>>[] { };
         }
 
@@ -35,7 +35,7 @@ namespace smtsharp.Expressions
 
         public ICollection<IVariable<Type>> Declarations => _declarations.Values;
 
-        public IVariable<Type>? GetDeclaration(string name) => 
+        public IVariable<Type>? GetDeclaration(string name) =>
             _declarations.TryGetValue(name, out var variable) ? variable : null;
 
         public T Add<T>(T expression) where T : IExpression<Type>
