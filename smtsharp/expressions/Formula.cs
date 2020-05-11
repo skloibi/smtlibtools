@@ -8,7 +8,8 @@ namespace smtsharp.Expressions
 {
     public class Formula
     {
-        private int _idCounter;
+        private int _idCounter = 1;
+        public int Length => _idCounter;
 
         public string Name { get; }
 
@@ -32,7 +33,7 @@ namespace smtsharp.Expressions
         private int GenerateId() =>
             Interlocked.Increment(ref _idCounter);
 
-        public IEnumerable<IVariable<Type>> Declarations => _declarations.Values;
+        public ICollection<IVariable<Type>> Declarations => _declarations.Values;
 
         public IVariable<Type>? GetDeclaration(string name)
         {
@@ -43,8 +44,6 @@ namespace smtsharp.Expressions
         {
             if (expression.IsDeclared)
                 throw new AlreadyInitializedException<T>(this, expression);
-
-            Console.WriteLine($"Initializing {expression}");
             expression.Initialize(this, GenerateId());
             return expression;
         }
@@ -54,7 +53,6 @@ namespace smtsharp.Expressions
             if (_declarations.ContainsKey(name))
                 return false;
             var variable = new Variable<T>(type, name);
-            Console.WriteLine($"Declaring {variable}");
             _declarations[name] = variable;
             return true;
         }
