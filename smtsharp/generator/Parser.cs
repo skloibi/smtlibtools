@@ -278,7 +278,6 @@ public delegate IVariable<Type>? VariableSource(string name);
 		expression = boolExpr; 
 		else 
 		Error(TypeMismatch, expr.Type, Bool.Type); 
-		Console.WriteLine(expression); 
 	}
 
 	void BitVecType(out FixedSizeBitVector type) {

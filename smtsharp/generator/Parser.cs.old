@@ -95,7 +95,7 @@ public delegate IVariable<Type>? VariableSource(string name);
     private bool CheckSameType(IExpression<Type> expected, IExpression<Type> actual) {
         if (expected.Type == actual.Type)
             return true;
-        Error(TypeMismatch, actual.Type, expected.Type);
+        Error(TypeMismatch, $"{actual} : {actual.Type}", $"{expected} : {expected.Type}");
         return false;
     }
     
