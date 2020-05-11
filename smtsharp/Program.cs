@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using smtsharp.export;
 using smtsharp.Expressions;
 using smtsharp.Generator;
 using smtsharp.Util;
@@ -58,7 +59,7 @@ namespace smtsharp
                         break;
                     case ":load":
                         var file = Console.ReadLine();
-                        Console.WriteLine("Loading file: " + file);
+                        Console.WriteLine($"Loading file '{file}'");
                         try
                         {
                             parser.ParseFile(file);
@@ -68,6 +69,11 @@ namespace smtsharp
                             Console.WriteLine($"ERROR: Could not load file: {e.Message}");
                         }
 
+                        break;
+                    case ":dot":
+                        var dotOutput = Console.ReadLine();
+                        Console.WriteLine($"Generating DOT file at '{dotOutput}'");
+                        DOTGenerator.FormulaToDOT(formActions, dotOutput);
                         break;
                     default:
                         parser.ParseExpression(line);
