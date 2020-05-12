@@ -1,0 +1,8 @@
+(set-logic QF_BVFP)
+(declare-fun a () Bool)
+(declare-fun b () (_ FloatingPoint 11 53))
+(assert a)
+(assert (fp.isZero b))
+(check-sat)
+(get-model)
+(exit)
