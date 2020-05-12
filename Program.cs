@@ -10,15 +10,6 @@ namespace smtsharp
 {
     class Program
     {
-        // private static void Print(Func<> a)
-        // {
-        //     Console.WriteLine("Declarations:");
-        //     foreach (IVariable<Type> variable in formula.Declarations)
-        //     {
-        //         Console.WriteLine(variable);
-        //     }
-        // }
-
         static void Main(string[] args)
         {
             var formula = new Formula("SMTLIB");
@@ -38,6 +29,11 @@ namespace smtsharp
                 {
                     case ":exit":
                         return;
+                    case ":reset":
+                        formula = new Formula("SMTLIB");
+                        formActions = new FormulaTraversal(formula);
+                        parser = new ParserWrapper(formula);
+                        break;
                     case ":check":
                         // TODO:
                         // Console.WriteLine($"; {solver.Check()}");

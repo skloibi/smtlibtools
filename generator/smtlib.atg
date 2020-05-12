@@ -9,15 +9,17 @@ using smtsharp.Expressions.Logic;
 using smtsharp.Expressions.Arithmetic;
 using smtsharp.Expressions.Comparison;
 using smtsharp.Generator.Error;
+using smtsharp.Expressions.FloatingPoint;
 
 using static smtsharp.Generator.Error.ErrorType;
 using static smtsharp.Expressions.Types.FixedSizeBitVector;
 
 using Type = smtsharp.Expressions.Types.Type;
+using Const = smtsharp.Expressions.Logic.Const;
 
 COMPILER SMTLIB
 
-    public delegate IVariable<Type>? VariableSource(string name);
+    public delegate IVariable<Type> VariableSource(string name);
     public delegate bool Declaration(Type type, string name);
     public delegate void AssertionSink(IExpression<Bool> assertion);
     
@@ -128,8 +130,9 @@ TOKENS
 //		["U" | "u" | "L" | "l" | "UL" | "Ul" | "uL" | "ul" | "LU" | "Lu" | "lU" | "lu"].
 //    /*--------------------------------------------------------------------------------*/
   
-	/*----- built-in sorts ----------------------------------------------------------*/
-	bool            = "Bool".
+	/*----- literals ----------------------------------------------------------*/
+	true            = "Bool".
+	false           = "false".
 
 COMMENTS FROM ";" TO eol
 
@@ -148,13 +151,13 @@ PRODUCTIONS
           BoolExpr<.out var assertion.>                         (. if (assertion != null) .)
                                                                 (.     Assert(assertion); .)
         | "set-logic" ident
-        | "set-option" option ident
-        | "push"
-        | "pop"
+        | "set-option" option (ident|number|true|false)
+        | "push" [number]
+        | "pop" [number]
         | "reset"
         | "check-sat"
         | "get-model"
-        | "get-value"
+        | "get-value" "(" ident {ident} ")"
         | "exit"
         )
         ")"
@@ -166,7 +169,7 @@ PRODUCTIONS
           ( BitVecType<out var bvType>                          (. type = bvType; .)
           | FloatingPointType<out var fpType>                   (. type = fpType; .)
           )
-        | bool                                                  (. type = Bool.Type; .)
+        | "Bool"                                                (. type = Bool.Type; .)
         )
         .
         
@@ -218,6 +221,7 @@ PRODUCTIONS
         ( "not" BoolExpr<.out var op.>                          (. expression = new Not(op); .)
         | "bvnot" BVExpr<.out var op.>                          (. expression = new Bitwise.Not(op); .)
         | "bvneg" BVExpr<.out var op.>                          (. expression = new Neg<FixedSizeBitVector>(op); .)
+        | "fp.isZero" FPExpr<.out var op.>                      (. expression = new IsZero(op); .)
         | "("
           ( "extract" 
             number                                              (. var endIdx = ParseInt(); .)
@@ -350,12 +354,11 @@ PRODUCTIONS
                                                                 (.     Error(TypeMismatch, expr.Type, "FixedSizeBitVector"); .)
         .
     
-    
-//    FPExpr<.out IExpression<FloatingPoint> expression.> =       (. expression = null; .)
-//        Expr<.out var expr.>                                    (. if (op is IExpression<FloatingPoint> fpExpr) .)
-//                                                                (.     expression = fpExpr; .)
-//                                                                (. else .)
-//                                                                (.     Error(TypeMismatch, expr.Type, "FloatingPoint"); .)
-//        .
+    FPExpr<.out IExpression<FloatingPoint> expression.> =       (. expression = null; .)
+        Expr<.out var expr.>                                    (. if (expr is IExpression<FloatingPoint> fpExpr) .)
+                                                                (.     expression = fpExpr; .)
+                                                                (. else .)
+                                                                (.     Error(TypeMismatch, expr.Type, "FloatingPoint"); .)
+        .
 
 END SMTLIB.

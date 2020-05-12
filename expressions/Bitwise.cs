@@ -13,7 +13,7 @@ namespace smtsharp.Expressions
                 base(x.Type, name)
             {
                 X = x;
-                Y = x;
+                Y = y;
             }
 
             public override IExpression<Type>[] Operands() => new IExpression<Type>[] {X, Y};
