@@ -9,4 +9,12 @@ represented in a graph-like structure of first-class expression types.
 The tool then allows to print the resulting expressions (starting from the formula *leaves* - i.e. the variable usages)
 as well as export of GraphVIZ code for visualization.
 
+## Options
+TODO
 
+## Open tasks
+- Add SMT-LIB generator to convert expressions back to SMT-LIB
+- Similarity check for added expressions (e.g. do not generate same expression twice)
+- Add obfuscator for SMT-LIB
+- Update colors and labels in GraphViz exporter
+- Add GraphViz generator (binary format)
