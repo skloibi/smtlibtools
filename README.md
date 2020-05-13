@@ -48,6 +48,11 @@ Commands have to be prefixed by "`:`":
 
   Stops the app.
 
+## Examples
+
+The [`samples`](./samples) folder contains test SMT-LIB files that may be read in order to see how the program works.
+Note that they are specifically tailored for this example and sometimes fitted with unnecessary meta commands to stress the parser.
+
 ## Q&A
 - Which SMT-LIB logics are supported?
 
