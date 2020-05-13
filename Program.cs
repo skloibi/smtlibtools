@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using smtsharp.export;
 using smtsharp.Expressions;
 using smtsharp.Generator;
@@ -15,7 +14,7 @@ namespace smtsharp
             var formula = new Formula("SMTLIB");
             var formActions = new FormulaTraversal(formula);
             var parser = new ParserWrapper(formula);
-
+            
             if (args.Length > 0)
             {
                 parser.ParseFile(args[0]);
@@ -33,10 +32,6 @@ namespace smtsharp
                         formula = new Formula("SMTLIB");
                         formActions = new FormulaTraversal(formula);
                         parser = new ParserWrapper(formula);
-                        break;
-                    case ":check":
-                        // TODO:
-                        // Console.WriteLine($"; {solver.Check()}");
                         break;
                     case ":show":
                         Console.WriteLine("================");
