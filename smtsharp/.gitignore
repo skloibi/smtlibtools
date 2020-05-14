@@ -1,9 +1,0 @@
-bin/
-obj/
-.idea/
-*.iml
-node_modulesnode_modules/
-
-*.csproj
-*.sln
-*.sln.DotSettings.user
