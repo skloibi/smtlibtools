@@ -42,6 +42,7 @@ Commands have to be prefixed by "`:`":
   Resets the current formula.
   
 - `:dot`
+
   Allows input of a target file to which the current expressions are written in DOT format.
 
 - `:exit`
