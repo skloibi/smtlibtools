@@ -67,7 +67,7 @@ namespace smtsharp.Expressions
 
         private readonly IList<IExpression<Type>> _targets;
 
-        protected Expression(T type, string name)
+        protected Expression(T type, string name = null)
         {
             Type = type;
             Name = name;
