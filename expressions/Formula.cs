@@ -18,16 +18,10 @@ namespace smtsharp.Expressions
         /// </summary>
         private readonly IDictionary<string, IVariable<Type>> _declarations;
 
-        /// <summary>
-        /// Stores all expressions in disjointed buckets that contain the expression IDs.
-        /// Whenever an expression is added, it may link two buckets, which may then be merged into one.
-        /// </summary>
-        // private readonly Dictionary<int, IExpression<Type>>[] _buckets;
         public Formula(string name)
         {
             Name = name;
             _declarations = new SortedDictionary<string, IVariable<Type>>();
-            // _buckets = new Dictionary<int, IExpression<Type>>[] { };
         }
 
         private int GenerateId() =>
