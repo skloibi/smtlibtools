@@ -31,9 +31,9 @@ namespace smtsharp.export
                 {
                     // write a format string for this one node
                     writer.WriteLine(GenerateNodeFormat(expression));
-                    foreach (var operand in expression.Operands())
-                        // accumulate format string and edge from node to operands
-                        edges.Add($"\"{expression.Id}\" -> \"{operand.Id}\";");
+                    var operands = expression.Operands();
+                    for (var i = 0; i < operands.Length; i++)
+                        edges.Add($"\"{expression.Id}\" -> \"{operands[i].Id}\" [label=\"({i})\"];");
                 }
 
                 traversal.Apply(AddEdge);
