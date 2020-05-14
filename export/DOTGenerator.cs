@@ -51,17 +51,17 @@ namespace smtsharp.export
             return string.Format("{0} [{1}]", expression.Id, expression switch
             {
                 Const c => GenerateConstantNode(c, "yellow"),
-                Expressions.BitVector.Const c => GenerateConstantNode(c, "aqua"),
+                Expressions.BitVector.Const c => GenerateConstantNode(c, "dodgerblue"),
                 Expressions.FloatingPoint.Const c => GenerateConstantNode(c, "lawngreen"),
                 IConstantExpression<Type, object> c => GenerateConstantNode(c, "darkgrey"),
                 IVariable<Bool> v => GenerateVariableNode(v, "yellow"),
-                IVariable<FixedSizeBitVector> v => GenerateVariableNode(v, "aqua"),
+                IVariable<FixedSizeBitVector> v => GenerateVariableNode(v, "dodgerblue"),
                 IVariable<FloatingPoint> v => GenerateVariableNode(v, "lawngreen"),
                 IVariable<Type> v => GenerateVariableNode(v, "darkgrey"),
                 IExpression<Bool> e => GenerateGenericNode(e, "khaki"),
                 IExpression<FixedSizeBitVector> e => GenerateGenericNode(e, "aquamarine"),
                 IExpression<FloatingPoint> e => GenerateGenericNode(e, "greenyellow"),
-                _ => GenerateGenericNode(expression, "greenyellow")
+                _ => GenerateGenericNode(expression, "azure")
             });
         }
 
