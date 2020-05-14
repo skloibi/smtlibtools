@@ -327,7 +327,7 @@ public delegate IVariable<Type> VariableSource(string name);
 			expression = GetVariable(t.val); 
 		} else if (la.kind == 6) {
 			Get();
-			if (la.kind == 5 || la.kind == 19 || la.kind == 24) {
+			if (la.kind == 4 || la.kind == 5 || la.kind == 19) {
 				Literal(out var constExpr);
 				expression = constExpr; 
 			} else if (StartOf(1)) {
@@ -340,7 +340,7 @@ public delegate IVariable<Type> VariableSource(string name);
 				Expr(out var trueExpr);
 				Expr(out var falseExpr);
 				expression = GenerateConditional(cond, trueExpr, falseExpr); 
-			} else if (la.kind == 52 || la.kind == 53 || la.kind == 54) {
+			} else if (StartOf(3)) {
 				VariadicExpr(out expression);
 			} else SynErr(60);
 			Expect(8);
@@ -357,9 +357,9 @@ public delegate IVariable<Type> VariableSource(string name);
 			var width = ParseInt(); 
 			var type = Bv(width); 
 			constant = new Expressions.BitVector.Const(type, value); 
-		} else if (la.kind == 5 || la.kind == 24) {
+		} else if (la.kind == 4 || la.kind == 5) {
 			Const lConst;
-			if (la.kind == 24) {
+			if (la.kind == 4) {
 				Get();
 				lConst = true; 
 			} else {
@@ -372,25 +372,25 @@ public delegate IVariable<Type> VariableSource(string name);
 
 	void UnaryExpr(out IExpression<Type> expression) {
 		expression = null; 
-		if (la.kind == 25) {
+		if (la.kind == 24) {
 			Get();
 			BoolExpr(out var op);
 			expression = new Not(op); 
-		} else if (la.kind == 26) {
+		} else if (la.kind == 25) {
 			Get();
 			BVExpr(out var op);
 			expression = new Bitwise.Not(op); 
-		} else if (la.kind == 27) {
+		} else if (la.kind == 26) {
 			Get();
 			BVExpr(out var op);
 			expression = new Neg<FixedSizeBitVector>(op); 
-		} else if (la.kind == 28) {
+		} else if (la.kind == 27) {
 			Get();
 			FPExpr(out var op);
 			expression = new IsZero(op); 
 		} else if (la.kind == 6) {
 			Get();
-			if (la.kind == 29) {
+			if (la.kind == 28) {
 				Get();
 				Expect(2);
 				var endIdx = ParseInt(); 
@@ -407,7 +407,7 @@ public delegate IVariable<Type> VariableSource(string name);
 				expression = new Extract(toType, op, startIdx); 
 			} else if (la.kind == 19) {
 				Get();
-				if (la.kind == 30) {
+				if (la.kind == 29) {
 					Get();
 					Expect(2);
 					var toBits = ParseInt(); 
@@ -415,14 +415,14 @@ public delegate IVariable<Type> VariableSource(string name);
 					Expect(8);
 					BVExpr(out var op);
 					expression = new SignExtend(toType, op); 
-				} else if (la.kind == 31) {
+				} else if (la.kind == 30) {
 					Get();
 					Expect(2);
 					var toBits = ParseInt(); 
 					var toType = Bv(toBits); 
 					Expect(8);
 					BVExpr(out var op);
-					expression = new SignExtend(toType, op); 
+					expression = new ZeroExtend(toType, op); 
 				} else SynErr(63);
 			} else SynErr(64);
 		} else SynErr(65);
@@ -431,140 +431,140 @@ public delegate IVariable<Type> VariableSource(string name);
 	void BinaryExpr(out IExpression<Type> expression) {
 		expression = null; 
 		switch (la.kind) {
-		case 32: {
+		case 31: {
 			Get();
 			BoolExpr(out var a);
 			BoolExpr(out var b);
 			if (CheckSameType(a, b)) expression = new Implies(a, b); 
 			break;
 		}
-		case 33: {
+		case 32: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new Bitwise.And(a, b); 
 			break;
 		}
-		case 34: {
+		case 33: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new Bitwise.Or(a, b); 
 			break;
 		}
-		case 35: {
+		case 34: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new Bitwise.XOr(a, b); 
 			break;
 		}
-		case 36: {
+		case 35: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new Add<FixedSizeBitVector>(a, b); 
 			break;
 		}
-		case 37: {
+		case 36: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new Mul<FixedSizeBitVector>(a, b); 
 			break;
 		}
-		case 38: {
+		case 37: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new Div<FixedSizeBitVector>(a, b); 
 			break;
 		}
-		case 39: {
+		case 38: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new UDiv(a, b); 
 			break;
 		}
-		case 40: {
+		case 39: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new Rem<FixedSizeBitVector>(a, b); 
 			break;
 		}
-		case 41: {
+		case 40: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new URem(a, b); 
 			break;
 		}
-		case 42: {
+		case 41: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new Bitwise.Shl(a, b); 
 			break;
 		}
-		case 43: {
+		case 42: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new Bitwise.LShr(a, b); 
 			break;
 		}
-		case 44: {
+		case 43: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new Lt<FixedSizeBitVector>(a, b); 
 			break;
 		}
-		case 45: {
+		case 44: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new Not(new Lt<FixedSizeBitVector>(b, a)); 
 			break;
 		}
-		case 46: {
+		case 45: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new Lt<FixedSizeBitVector>(b, a); 
 			break;
 		}
-		case 47: {
+		case 46: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new Not(new Lt<FixedSizeBitVector>(a, b)); 
 			break;
 		}
-		case 48: {
+		case 47: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new ULt(a, b); 
 			break;
 		}
-		case 49: {
+		case 48: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new Not(new ULt(b, a)); 
 			break;
 		}
-		case 50: {
+		case 49: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
 			if (CheckSameType(a, b)) expression = new ULt(b, a); 
 			break;
 		}
-		case 51: {
+		case 50: {
 			Get();
 			BVExpr(out var a);
 			BVExpr(out var b);
@@ -577,9 +577,9 @@ public delegate IVariable<Type> VariableSource(string name);
 
 	void VariadicExpr(out IExpression<Type> expression) {
 		expression = null; 
-		if (la.kind == 52 || la.kind == 53) {
+		if (la.kind == 51 || la.kind == 52 || la.kind == 53) {
 			IExpression<Bool> expr; 
-			if (la.kind == 52) {
+			if (la.kind == 51) {
 				Get();
 				BoolExpr(out expr);
 				BoolExpr(out var op);
@@ -588,14 +588,23 @@ public delegate IVariable<Type> VariableSource(string name);
 					BoolExpr(out op);
 					expr = new And(expr, op); 
 				}
+			} else if (la.kind == 52) {
+				Get();
+				BoolExpr(out expr);
+				BoolExpr(out var op);
+				expr = new Or(expr, op); 
+				while (la.kind == 1 || la.kind == 6) {
+					BoolExpr(out op);
+					expr = new Or(expr, op); 
+				}
 			} else {
 				Get();
 				BoolExpr(out expr);
 				BoolExpr(out var op);
-				expr = new And(expr, op); 
+				expr = new XOr(expr, op); 
 				while (la.kind == 1 || la.kind == 6) {
 					BoolExpr(out op);
-					expr = new And(expr, op); 
+					expr = new XOr(expr, op); 
 				}
 			}
 			expression = expr; 
@@ -643,8 +652,9 @@ public delegate IVariable<Type> VariableSource(string name);
 	
 	static readonly bool[,] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x}
+		{_x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_x, _x}
 
 	};
 } // end Parser
@@ -678,40 +688,40 @@ public class Errors {
 			case 17: s = "\"get-value\" expected"; break;
 			case 18: s = "\"exit\" expected"; break;
 			case 19: s = "\"_\" expected"; break;
-			case 20: s = "\"bool\" expected"; break;
+			case 20: s = "\"Bool\" expected"; break;
 			case 21: s = "\"BitVec\" expected"; break;
 			case 22: s = "\"FloatingPoint\" expected"; break;
 			case 23: s = "\"ite\" expected"; break;
-			case 24: s = "\"true\" expected"; break;
-			case 25: s = "\"not\" expected"; break;
-			case 26: s = "\"bvnot\" expected"; break;
-			case 27: s = "\"bvneg\" expected"; break;
-			case 28: s = "\"fp.isZero\" expected"; break;
-			case 29: s = "\"extract\" expected"; break;
-			case 30: s = "\"sign_extend\" expected"; break;
-			case 31: s = "\"zero_extend\" expected"; break;
-			case 32: s = "\"=>\" expected"; break;
-			case 33: s = "\"bvand\" expected"; break;
-			case 34: s = "\"bvor\" expected"; break;
-			case 35: s = "\"bvxor\" expected"; break;
-			case 36: s = "\"bvadd\" expected"; break;
-			case 37: s = "\"bvmul\" expected"; break;
-			case 38: s = "\"bvsdiv\" expected"; break;
-			case 39: s = "\"bvudiv\" expected"; break;
-			case 40: s = "\"bvsrem\" expected"; break;
-			case 41: s = "\"bvurem\" expected"; break;
-			case 42: s = "\"bvshl\" expected"; break;
-			case 43: s = "\"bvlshr\" expected"; break;
-			case 44: s = "\"bvslt\" expected"; break;
-			case 45: s = "\"bvsle\" expected"; break;
-			case 46: s = "\"bvsgt\" expected"; break;
-			case 47: s = "\"bvsge\" expected"; break;
-			case 48: s = "\"bvult\" expected"; break;
-			case 49: s = "\"bvule\" expected"; break;
-			case 50: s = "\"bvugt\" expected"; break;
-			case 51: s = "\"bvuge\" expected"; break;
-			case 52: s = "\"and\" expected"; break;
-			case 53: s = "\"or\" expected"; break;
+			case 24: s = "\"not\" expected"; break;
+			case 25: s = "\"bvnot\" expected"; break;
+			case 26: s = "\"bvneg\" expected"; break;
+			case 27: s = "\"fp.isZero\" expected"; break;
+			case 28: s = "\"extract\" expected"; break;
+			case 29: s = "\"sign_extend\" expected"; break;
+			case 30: s = "\"zero_extend\" expected"; break;
+			case 31: s = "\"=>\" expected"; break;
+			case 32: s = "\"bvand\" expected"; break;
+			case 33: s = "\"bvor\" expected"; break;
+			case 34: s = "\"bvxor\" expected"; break;
+			case 35: s = "\"bvadd\" expected"; break;
+			case 36: s = "\"bvmul\" expected"; break;
+			case 37: s = "\"bvsdiv\" expected"; break;
+			case 38: s = "\"bvudiv\" expected"; break;
+			case 39: s = "\"bvsrem\" expected"; break;
+			case 40: s = "\"bvurem\" expected"; break;
+			case 41: s = "\"bvshl\" expected"; break;
+			case 42: s = "\"bvlshr\" expected"; break;
+			case 43: s = "\"bvslt\" expected"; break;
+			case 44: s = "\"bvsle\" expected"; break;
+			case 45: s = "\"bvsgt\" expected"; break;
+			case 46: s = "\"bvsge\" expected"; break;
+			case 47: s = "\"bvult\" expected"; break;
+			case 48: s = "\"bvule\" expected"; break;
+			case 49: s = "\"bvugt\" expected"; break;
+			case 50: s = "\"bvuge\" expected"; break;
+			case 51: s = "\"and\" expected"; break;
+			case 52: s = "\"or\" expected"; break;
+			case 53: s = "\"xor\" expected"; break;
 			case 54: s = "\"=\" expected"; break;
 			case 55: s = "??? expected"; break;
 			case 56: s = "invalid SMTLIB"; break;

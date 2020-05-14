@@ -131,7 +131,7 @@ TOKENS
 //    /*--------------------------------------------------------------------------------*/
   
 	/*----- literals ----------------------------------------------------------*/
-	true            = "Bool".
+	true            = "true".
 	false           = "false".
 
 COMMENTS FROM ";" TO eol
@@ -222,7 +222,7 @@ PRODUCTIONS
         | "bvnot" BVExpr<.out var op.>                          (. expression = new Bitwise.Not(op); .)
         | "bvneg" BVExpr<.out var op.>                          (. expression = new Neg<FixedSizeBitVector>(op); .)
         | "fp.isZero" FPExpr<.out var op.>                      (. expression = new IsZero(op); .)
-        | "("
+        | "(" "_"
           ( "extract" 
             number                                              (. var endIdx = ParseInt(); .)
             number                                              (. var startIdx = ParseInt(); .)
@@ -234,18 +234,16 @@ PRODUCTIONS
             ")"
             BVExpr<.out var op.>                                (. if (toType != null) .)
                                                                 (.     expression = new Extract(toType, op, startIdx); .)
-          | "_" 
-            ( "sign_extend"
-              number                                            (. var toBits = ParseInt(); .)
+          | "sign_extend"
+            number                                              (. var toBits = ParseInt(); .)
                                                                 (. var toType = Bv(toBits); .)
-              ")"
-              BVExpr<.out var op.>                              (. expression = new SignExtend(toType, op); .)
-            | "zero_extend"
-              number                                            (. var toBits = ParseInt(); .)
+            ")"
+            BVExpr<.out var op.>                                (. expression = new SignExtend(toType, op); .)
+          | "zero_extend"
+            number                                              (. var toBits = ParseInt(); .)
                                                                 (. var toType = Bv(toBits); .)
-              ")"
-              BVExpr<.out var op.>                              (. expression = new SignExtend(toType, op); .)
-            )
+            ")"
+            BVExpr<.out var op.>                                (. expression = new ZeroExtend(toType, op); .)
           )
         )
         .
@@ -324,9 +322,15 @@ PRODUCTIONS
             }
           | "or"
             BoolExpr<.out expr.>
-            BoolExpr<.out var op.>                              (. expr = new And(expr, op); .)
+            BoolExpr<.out var op.>                              (. expr = new Or(expr, op); .)
             { 
-              BoolExpr<.out op.>                                (. expr = new And(expr, op); .)
+              BoolExpr<.out op.>                                (. expr = new Or(expr, op); .)
+            }
+          | "xor"
+            BoolExpr<.out expr.>
+            BoolExpr<.out var op.>                              (. expr = new XOr(expr, op); .)
+            { 
+              BoolExpr<.out op.>                                (. expr = new XOr(expr, op); .)
             }
           )                                                     (. expression = expr; .)
         | "="

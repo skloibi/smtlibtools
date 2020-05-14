@@ -30,7 +30,7 @@ public class Parser {
 	public const int _option = 3;
 	public const int _true = 4;
 	public const int _false = 5;
-	public const int maxT = 54;
+	public const int maxT = 55;
 
 	const bool _T = true;
 	const bool _x = false;
@@ -227,7 +227,7 @@ public delegate IVariable<Type> VariableSource(string name);
 					Get();
 				} else if (la.kind == 5) {
 					Get();
-				} else SynErr(55);
+				} else SynErr(56);
 				break;
 			}
 			case 12: {
@@ -270,7 +270,7 @@ public delegate IVariable<Type> VariableSource(string name);
 				Get();
 				break;
 			}
-			default: SynErr(56); break;
+			default: SynErr(57); break;
 			}
 			Expect(8);
 		}
@@ -281,17 +281,17 @@ public delegate IVariable<Type> VariableSource(string name);
 		if (la.kind == 6) {
 			Get();
 			Expect(19);
-			if (la.kind == 20) {
+			if (la.kind == 21) {
 				BitVecType(out var bvType);
 				type = bvType; 
-			} else if (la.kind == 21) {
+			} else if (la.kind == 22) {
 				FloatingPointType(out var fpType);
 				type = fpType; 
-			} else SynErr(57);
-		} else if (la.kind == 4) {
+			} else SynErr(58);
+		} else if (la.kind == 20) {
 			Get();
 			type = Bool.Type; 
-		} else SynErr(58);
+		} else SynErr(59);
 	}
 
 	void BoolExpr(out IExpression<Bool> expression) {
@@ -304,14 +304,14 @@ public delegate IVariable<Type> VariableSource(string name);
 	}
 
 	void BitVecType(out FixedSizeBitVector type) {
-		Expect(20);
+		Expect(21);
 		Expect(2);
 		type = Bv(ParseInt()); 
 		Expect(8);
 	}
 
 	void FloatingPointType(out FloatingPoint type) {
-		Expect(21);
+		Expect(22);
 		Expect(2);
 		var eb = ParseInt();
 		Expect(2);
@@ -327,24 +327,24 @@ public delegate IVariable<Type> VariableSource(string name);
 			expression = GetVariable(t.val); 
 		} else if (la.kind == 6) {
 			Get();
-			if (la.kind == 5 || la.kind == 19 || la.kind == 23) {
+			if (la.kind == 4 || la.kind == 5 || la.kind == 19) {
 				Literal(out var constExpr);
 				expression = constExpr; 
 			} else if (StartOf(1)) {
 				UnaryExpr(out expression);
 			} else if (StartOf(2)) {
 				BinaryExpr(out expression);
-			} else if (la.kind == 22) {
+			} else if (la.kind == 23) {
 				Get();
 				BoolExpr(out var cond);
 				Expr(out var trueExpr);
 				Expr(out var falseExpr);
 				expression = GenerateConditional(cond, trueExpr, falseExpr); 
-			} else if (la.kind == 51 || la.kind == 52 || la.kind == 53) {
+			} else if (StartOf(3)) {
 				VariadicExpr(out expression);
-			} else SynErr(59);
+			} else SynErr(60);
 			Expect(8);
-		} else SynErr(60);
+		} else SynErr(61);
 	}
 
 	void Literal(out IExpression<Type> constant) {
@@ -357,9 +357,9 @@ public delegate IVariable<Type> VariableSource(string name);
 			var width = ParseInt(); 
 			var type = Bv(width); 
 			constant = new Expressions.BitVector.Const(type, value); 
-		} else if (la.kind == 5 || la.kind == 23) {
+		} else if (la.kind == 4 || la.kind == 5) {
 			Const lConst;
-			if (la.kind == 23) {
+			if (la.kind == 4) {
 				Get();
 				lConst = true; 
 			} else {
@@ -367,7 +367,7 @@ public delegate IVariable<Type> VariableSource(string name);
 				lConst = false; 
 			}
 			constant = lConst; 
-		} else SynErr(61);
+		} else SynErr(62);
 	}
 
 	void UnaryExpr(out IExpression<Type> expression) {
@@ -390,6 +390,7 @@ public delegate IVariable<Type> VariableSource(string name);
 			expression = new IsZero(op); 
 		} else if (la.kind == 6) {
 			Get();
+			Expect(19);
 			if (la.kind == 28) {
 				Get();
 				Expect(2);
@@ -405,25 +406,22 @@ public delegate IVariable<Type> VariableSource(string name);
 				BVExpr(out var op);
 				if (toType != null) 
 				expression = new Extract(toType, op, startIdx); 
-			} else if (la.kind == 19) {
+			} else if (la.kind == 29) {
 				Get();
-				if (la.kind == 29) {
-					Get();
-					Expect(2);
-					var toBits = ParseInt(); 
-					var toType = Bv(toBits); 
-					Expect(8);
-					BVExpr(out var op);
-					expression = new SignExtend(toType, op); 
-				} else if (la.kind == 30) {
-					Get();
-					Expect(2);
-					var toBits = ParseInt(); 
-					var toType = Bv(toBits); 
-					Expect(8);
-					BVExpr(out var op);
-					expression = new SignExtend(toType, op); 
-				} else SynErr(62);
+				Expect(2);
+				var toBits = ParseInt(); 
+				var toType = Bv(toBits); 
+				Expect(8);
+				BVExpr(out var op);
+				expression = new SignExtend(toType, op); 
+			} else if (la.kind == 30) {
+				Get();
+				Expect(2);
+				var toBits = ParseInt(); 
+				var toType = Bv(toBits); 
+				Expect(8);
+				BVExpr(out var op);
+				expression = new ZeroExtend(toType, op); 
 			} else SynErr(63);
 		} else SynErr(64);
 	}
@@ -577,7 +575,7 @@ public delegate IVariable<Type> VariableSource(string name);
 
 	void VariadicExpr(out IExpression<Type> expression) {
 		expression = null; 
-		if (la.kind == 51 || la.kind == 52) {
+		if (la.kind == 51 || la.kind == 52 || la.kind == 53) {
 			IExpression<Bool> expr; 
 			if (la.kind == 51) {
 				Get();
@@ -588,18 +586,27 @@ public delegate IVariable<Type> VariableSource(string name);
 					BoolExpr(out op);
 					expr = new And(expr, op); 
 				}
+			} else if (la.kind == 52) {
+				Get();
+				BoolExpr(out expr);
+				BoolExpr(out var op);
+				expr = new Or(expr, op); 
+				while (la.kind == 1 || la.kind == 6) {
+					BoolExpr(out op);
+					expr = new Or(expr, op); 
+				}
 			} else {
 				Get();
 				BoolExpr(out expr);
 				BoolExpr(out var op);
-				expr = new And(expr, op); 
+				expr = new XOr(expr, op); 
 				while (la.kind == 1 || la.kind == 6) {
 					BoolExpr(out op);
-					expr = new And(expr, op); 
+					expr = new XOr(expr, op); 
 				}
 			}
 			expression = expr; 
-		} else if (la.kind == 53) {
+		} else if (la.kind == 54) {
 			Get();
 			Expr(out var expr);
 			Expr(out var op);
@@ -642,9 +649,10 @@ public delegate IVariable<Type> VariableSource(string name);
 	}
 	
 	static readonly bool[,] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_x, _x}
 
 	};
 } // end Parser
@@ -678,10 +686,10 @@ public class Errors {
 			case 17: s = "\"get-value\" expected"; break;
 			case 18: s = "\"exit\" expected"; break;
 			case 19: s = "\"_\" expected"; break;
-			case 20: s = "\"BitVec\" expected"; break;
-			case 21: s = "\"FloatingPoint\" expected"; break;
-			case 22: s = "\"ite\" expected"; break;
-			case 23: s = "\"true\" expected"; break;
+			case 20: s = "\"Bool\" expected"; break;
+			case 21: s = "\"BitVec\" expected"; break;
+			case 22: s = "\"FloatingPoint\" expected"; break;
+			case 23: s = "\"ite\" expected"; break;
 			case 24: s = "\"not\" expected"; break;
 			case 25: s = "\"bvnot\" expected"; break;
 			case 26: s = "\"bvneg\" expected"; break;
@@ -711,16 +719,16 @@ public class Errors {
 			case 50: s = "\"bvuge\" expected"; break;
 			case 51: s = "\"and\" expected"; break;
 			case 52: s = "\"or\" expected"; break;
-			case 53: s = "\"=\" expected"; break;
-			case 54: s = "??? expected"; break;
-			case 55: s = "invalid SMTLIB"; break;
+			case 53: s = "\"xor\" expected"; break;
+			case 54: s = "\"=\" expected"; break;
+			case 55: s = "??? expected"; break;
 			case 56: s = "invalid SMTLIB"; break;
-			case 57: s = "invalid Type"; break;
+			case 57: s = "invalid SMTLIB"; break;
 			case 58: s = "invalid Type"; break;
-			case 59: s = "invalid Expr"; break;
+			case 59: s = "invalid Type"; break;
 			case 60: s = "invalid Expr"; break;
-			case 61: s = "invalid Literal"; break;
-			case 62: s = "invalid UnaryExpr"; break;
+			case 61: s = "invalid Expr"; break;
+			case 62: s = "invalid Literal"; break;
 			case 63: s = "invalid UnaryExpr"; break;
 			case 64: s = "invalid UnaryExpr"; break;
 			case 65: s = "invalid BinaryExpr"; break;

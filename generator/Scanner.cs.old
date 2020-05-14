@@ -321,7 +321,7 @@ public class Scanner {
 
 	void CheckLiteral() {
 		switch (t.val) {
-			case "Bool": t.kind = 4; break;
+			case "true": t.kind = 4; break;
 			case "false": t.kind = 5; break;
 			case "assert": t.kind = 9; break;
 			case "push": t.kind = 12; break;
@@ -329,38 +329,38 @@ public class Scanner {
 			case "reset": t.kind = 14; break;
 			case "exit": t.kind = 18; break;
 			case "_": t.kind = 19; break;
-			case "bool": t.kind = 20; break;
+			case "Bool": t.kind = 20; break;
 			case "BitVec": t.kind = 21; break;
 			case "FloatingPoint": t.kind = 22; break;
 			case "ite": t.kind = 23; break;
-			case "true": t.kind = 24; break;
-			case "not": t.kind = 25; break;
-			case "bvnot": t.kind = 26; break;
-			case "bvneg": t.kind = 27; break;
-			case "extract": t.kind = 29; break;
-			case "sign_extend": t.kind = 30; break;
-			case "zero_extend": t.kind = 31; break;
-			case "bvand": t.kind = 33; break;
-			case "bvor": t.kind = 34; break;
-			case "bvxor": t.kind = 35; break;
-			case "bvadd": t.kind = 36; break;
-			case "bvmul": t.kind = 37; break;
-			case "bvsdiv": t.kind = 38; break;
-			case "bvudiv": t.kind = 39; break;
-			case "bvsrem": t.kind = 40; break;
-			case "bvurem": t.kind = 41; break;
-			case "bvshl": t.kind = 42; break;
-			case "bvlshr": t.kind = 43; break;
-			case "bvslt": t.kind = 44; break;
-			case "bvsle": t.kind = 45; break;
-			case "bvsgt": t.kind = 46; break;
-			case "bvsge": t.kind = 47; break;
-			case "bvult": t.kind = 48; break;
-			case "bvule": t.kind = 49; break;
-			case "bvugt": t.kind = 50; break;
-			case "bvuge": t.kind = 51; break;
-			case "and": t.kind = 52; break;
-			case "or": t.kind = 53; break;
+			case "not": t.kind = 24; break;
+			case "bvnot": t.kind = 25; break;
+			case "bvneg": t.kind = 26; break;
+			case "extract": t.kind = 28; break;
+			case "sign_extend": t.kind = 29; break;
+			case "zero_extend": t.kind = 30; break;
+			case "bvand": t.kind = 32; break;
+			case "bvor": t.kind = 33; break;
+			case "bvxor": t.kind = 34; break;
+			case "bvadd": t.kind = 35; break;
+			case "bvmul": t.kind = 36; break;
+			case "bvsdiv": t.kind = 37; break;
+			case "bvudiv": t.kind = 38; break;
+			case "bvsrem": t.kind = 39; break;
+			case "bvurem": t.kind = 40; break;
+			case "bvshl": t.kind = 41; break;
+			case "bvlshr": t.kind = 42; break;
+			case "bvslt": t.kind = 43; break;
+			case "bvsle": t.kind = 44; break;
+			case "bvsgt": t.kind = 45; break;
+			case "bvsge": t.kind = 46; break;
+			case "bvult": t.kind = 47; break;
+			case "bvule": t.kind = 48; break;
+			case "bvugt": t.kind = 49; break;
+			case "bvuge": t.kind = 50; break;
+			case "and": t.kind = 51; break;
+			case "or": t.kind = 52; break;
+			case "xor": t.kind = 53; break;
 			default: break;
 		}
 	}
@@ -504,9 +504,9 @@ public class Scanner {
 				if (ch == 'o') {AddCh(); goto case 41;}
 				else {goto case 0;}
 			case 41:
-				{t.kind = 28; break;}
+				{t.kind = 27; break;}
 			case 42:
-				{t.kind = 32; break;}
+				{t.kind = 31; break;}
 			case 43:
 				recEnd = pos; recKind = 1;
 				if (ch >= '0' && ch <= '9' || ch >= 'A' && ch <= 'Z' || ch == '_' || ch >= 'a' && ch <= 'd' || ch >= 'f' && ch <= 'z') {AddCh(); goto case 1;}
