@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Numerics;
-using Microsoft.VisualBasic;
 using smtsharp.Expressions.Types;
 
 #nullable enable
