@@ -1,5 +1,5 @@
 (set-logic QF_BV)
-(set-option :produce-models trues)
+(set-option :produce-models true)
 (declare-fun a () (_ BitVec 32))
 (declare-fun b () (_ BitVec 32))
 (declare-fun c () Bool)
