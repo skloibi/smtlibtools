@@ -1,13 +1,14 @@
 using System;
 using System.Collections;
 using smtsharp.Expressions.Types;
+using FP = smtsharp.Expressions.Types.FloatingPoint;
 using Type = smtsharp.Expressions.Types.Type;
 
 namespace smtsharp.Expressions
 {
     namespace FloatingPoint
     {
-        public class Const : ConstantExpression<FixedSizeBitVector, (bool, BitArray, BitArray)>
+        public class Const : Expression<FP>, IConstantExpression<FP, (bool, BitArray, BitArray)>
         {
             public bool Signed { get; }
             private readonly BitArray _exponent;
@@ -23,9 +24,9 @@ namespace smtsharp.Expressions
             /// </summary>
             public BitArray Significand => new BitArray(_significand);
 
-            public override (bool, BitArray, BitArray) Value => (Signed, Significand, Exponent);
+            public (bool, BitArray, BitArray) Value => (Signed, Significand, Exponent);
 
-            public Const(FixedSizeBitVector type, string name, bool signed, BitArray exponent, BitArray significand) :
+            public Const(FP type, string name, bool signed, BitArray exponent, BitArray significand) :
                 base(type, name)
             {
                 Signed = signed;
@@ -33,30 +34,29 @@ namespace smtsharp.Expressions
                 _significand = significand;
             }
 
-            public Const(FixedSizeBitVector type, bool signed, BitArray exponent, BitArray significand) :
+            public Const(FP type, bool signed, BitArray exponent, BitArray significand) :
                 this(type, null, signed, exponent, significand)
             {
             }
+
+            public override IExpression<Type>[] Operands() => new IExpression<Type>[0];
 
             public override string ToString() => $@"({(Convert.ToByte(Signed))} {_exponent} {_significand})";
         }
 
         public class IsZero : Expression<Bool>
         {
-            public IExpression<Types.FloatingPoint> Operand { get; }
+            public IExpression<FP> Operand { get; }
 
-            public IsZero(string name, IExpression<Types.FloatingPoint> operand) : base(Bool.Type, name) =>
+            public IsZero(string name, IExpression<FP> operand) : base(Bool.Type, name) =>
                 Operand = operand;
 
-            public IsZero(IExpression<Types.FloatingPoint> operand) : base(Bool.Type, null) =>
+            public IsZero(IExpression<FP> operand) : base(Bool.Type, null) =>
                 Operand = operand;
 
             public override IExpression<Type>[] Operands() => new IExpression<Type>[] {Operand};
 
-            public override string ToString()
-            {
-                return $"isZero?({Operand})";
-            }
+            public override string ToString() => $"isZero?({Operand})";
         }
     }
 }

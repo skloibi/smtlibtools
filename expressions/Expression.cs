@@ -96,14 +96,8 @@ namespace smtsharp.Expressions
         }
     }
 
-    public abstract class ConstantExpression<T, V> : Expression<T> where T : Type
+    public interface IConstantExpression<out T, out V> : IExpression<T> where T : Type
     {
-        public abstract V Value { get; }
-
-        protected ConstantExpression(T type, string name) : base(type, name)
-        {
-        }
-
-        public override IExpression<Type>[] Operands() => new IExpression<Type>[0];
+        public V Value { get; }
     }
 }

@@ -6,12 +6,19 @@ namespace smtsharp.Expressions
 {
     namespace Logic
     {
-        public class Const : ConstantExpression<Bool, bool>
+        public abstract class LogicExpression : Expression<Bool>
+        {
+            protected LogicExpression(Bool type, string name) : base(type, name)
+            {
+            }
+        }
+
+        public class Const : LogicExpression, IConstantExpression<Bool, bool>
         {
             public static readonly Const True = new Const(true);
             public static readonly Const False = new Const(false);
 
-            public override bool Value { get; }
+            public bool Value { get; }
 
             private Const(bool value) : base(Bool.Type, null) =>
                 Value = value;
@@ -19,14 +26,9 @@ namespace smtsharp.Expressions
             public static implicit operator bool(Const c) => c.Value;
             public static implicit operator Const(bool b) => b ? True : False;
 
-            public override string ToString() => $@"{Value}";
-        }
+            public override IExpression<Type>[] Operands() => new IExpression<Type>[0];
 
-        public abstract class LogicExpression : Expression<Bool>
-        {
-            protected LogicExpression(Bool type, string name) : base(type, name)
-            {
-            }
+            public override string ToString() => $@"{Value}";
         }
 
         public class Not : LogicExpression
