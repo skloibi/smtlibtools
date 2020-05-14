@@ -1,14 +1,17 @@
 # SMT#
 
 This project provides a parser for a limited subset of the [SMT-LIB standard](http://smtlib.cs.uiowa.edu/) for interaction with 
-Satisfiability Modulo Theory (SMT) solvers. While the parser is generated using an attributed grammar
+Satisfiability Modulo Theory (SMT) solvers. The parser is generated using an attributed grammar
 and the [Coco/R](http://www.ssw.uni-linz.ac.at/Coco/) compiler generator.
 By now, mostly the theories of **FixedSizeBitVector** and **FloatingPoint** are supported and internally
 represented in a graph-like structure of first-class expression types.
 
+Users can provide formulas either via direct input or by loading target files.
 The tool then allows to print the resulting expressions (starting from the formula *leaves* - i.e. the variable usages)
-as well as export of [GraphVIZ](https://graphviz.org/) code for visualization.
-See the [DOT](https://graphviz.gitlab.io/_pages/doc/info/lang.html) format for more information.
+as well as export of [GraphVIZ](https://graphviz.org/) code for visualization (see the [DOT specification](https://graphviz.gitlab.io/_pages/doc/info/lang.html) for information about styles and syntax).
+
+This export functionality especially useful, as SMT-LIB formulas tend to get quite large (even more so when generated automatically) 
+and - due to the syntax - are often hard to analyse in their raw form.
 
 This project was developed as a toy application to learn and explore some of the unique language features of C#, 
 thus some components were specifically designed to embrace concepts like *runtime supported generic types*,
@@ -18,7 +21,7 @@ thus some components were specifically designed to embrace concepts like *runtim
 The program inherently manages one formula that may be extended via directly input expressions or parsed files.
 The state itself can be controlled via meta commands to reset the formula or get an overview of the currently stored expressions.
 Note that SMT-LIB expressions for evaluation (`(check-sat)`, `(get-value (...))`) or assertion state control such as `push`, `pop` are simply 
-ignored by the parser.
+ignored by the parser. The [Examples](#Examples) section showcases a typical usage scenario in form of a step-by-step tutorial.
 
 ## Options
 The project is presented as a basic command line app, sporting a number of interpreted commands.
