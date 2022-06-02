@@ -181,7 +181,7 @@ Nr. of expressions: 25)
 ================
 ```
 From the initial formula we can derive that `f` essentially indicates whether `a` is zero.
-Let's not add another expression that fixates `a` to be `1` if `f` does not hold:
+Let's now add another expression that fixates `a` to be `1` if `f` does not hold:
 ```
 (assert (=> (not f) (= a (_ bv1 32))))
 ```
